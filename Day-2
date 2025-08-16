@@ -1,0 +1,39 @@
+#include <stdio.h>
+
+int findMissingNumber(int arr[], int n) {
+    // Calculate expected sum of first n natural numbers
+    long long totalSum = (long long)n * (n + 1) / 2;
+
+    // Calculate actual sum of given array
+    long long arraySum = 0;
+    for (int i = 0; i < n - 1; i++) {
+        arraySum += arr[i];
+    }
+
+    // Missing number
+    return (int)(totalSum - arraySum);
+}
+
+int main() {
+    // Example Test Cases
+    int arr1[] = {1, 2, 4, 5};
+    int n1 = 5;
+    printf("Missing number: %d\n", findMissingNumber(arr1, n1));
+
+    int arr2[] = {2, 3, 4, 5};
+    int n2 = 5;
+    printf("Missing number: %d\n", findMissingNumber(arr2, n2));
+
+    int arr3[] = {1, 2, 3, 4};
+    int n3 = 5;
+    printf("Missing number: %d\n", findMissingNumber(arr3, n3));
+
+    int arr4[] = {1};
+    int n4 = 2;
+    printf("Missing number: %d\n", findMissingNumber(arr4, n4));
+
+    // Large test (just example, not printing whole array)
+    int n5 = 1000000;
+
+    return 0;
+}
