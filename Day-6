@@ -1,0 +1,88 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define TABLE_SIZE 100003  // Large prime for hashing
+
+// Structure for linked list node in hash table
+typedef struct Node {
+    long long prefixSum;
+    int index;
+    struct Node* next;
+} Node;
+
+Node* hashTable[TABLE_SIZE];
+
+// Hash function
+int hashFunc(long long key) {
+    if (key < 0) key = -key;
+    return key % TABLE_SIZE;
+}
+
+// Insert prefix sum with index
+void insert(long long sum, int index) {
+    int hashIndex = hashFunc(sum);
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->prefixSum = sum;
+    newNode->index = index;
+    newNode->next = hashTable[hashIndex];
+    hashTable[hashIndex] = newNode;
+}
+
+// Search for all indices with given prefix sum
+Node* search(long long sum) {
+    int hashIndex = hashFunc(sum);
+    Node* temp = hashTable[hashIndex];
+    return temp;
+}
+
+// Free memory
+void freeTable() {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Node* temp = hashTable[i];
+        while (temp) {
+            Node* del = temp;
+            temp = temp->next;
+            free(del);
+        }
+        hashTable[i] = NULL;
+    }
+}
+
+// Function to find all subarrays with sum 0
+void findZeroSumSubarrays(int arr[], int n) {
+    long long prefixSum = 0;
+
+    // Initialize hash table
+    for (int i = 0; i < TABLE_SIZE; i++) hashTable[i] = NULL;
+
+    // Insert prefix sum = 0 at index -1 (base case)
+    insert(0, -1);
+
+    for (int i = 0; i < n; i++) {
+        prefixSum += arr[i];
+
+        Node* temp = search(prefixSum);
+
+        // If prefix sum seen before -> subarray from index+1 to i has sum 0
+        while (temp) {
+            printf("(%d, %d)\n", temp->index + 1, i);
+            temp = temp->next;
+        }
+
+        // Insert current prefix sum with index
+        insert(prefixSum, i);
+    }
+
+    freeTable();
+}
+
+// Driver code
+int main() {
+    int arr[] = {1, 2, -3, 3, -1, 2};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Zero-sum subarrays:\n");
+    findZeroSumSubarrays(arr, n);
+
+    return 0;
+}
