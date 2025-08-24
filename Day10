@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Function to compare two chars (for qsort)
+int cmpChar(const void *a, const void *b) {
+    return (*(char *)a - *(char *)b);
+}
+
+// Function to sort a string
+char* sortString(const char *str) {
+    char *sorted = strdup(str); // make a copy
+    qsort(sorted, strlen(sorted), sizeof(char), cmpChar);
+    return sorted;
+}
+
+int main() {
+    // Example input
+    char *strs[] = {"eat", "tea", "tan", "ate", "nat", "bat"};
+    int n = sizeof(strs) / sizeof(strs[0]);
+
+    // Array to hold sorted versions
+    char **sortedStrs = (char **)malloc(n * sizeof(char *));
+    for (int i = 0; i < n; i++) {
+        sortedStrs[i] = sortString(strs[i]);
+    }
+
+    int visited[n];
+    memset(visited, 0, sizeof(visited));
+
+    printf("Grouped Anagrams:\n[\n");
+    for (int i = 0; i < n; i++) {
+        if (visited[i]) continue;
+
+        printf("  [");
+        printf("\"%s\"", strs[i]);
+        visited[i] = 1;
+
+        for (int j = i + 1; j < n; j++) {
+            if (!visited[j] && strcmp(sortedStrs[i], sortedStrs[j]) == 0) {
+                printf(", \"%s\"", strs[j]);
+                visited[j] = 1;
+            }
+        }
+        printf("]\n");
+    }
+    printf("]\n");
+
+    // Free memory
+    for (int i = 0; i < n; i++) free(sortedStrs[i]);
+    free(sortedStrs);
+
+    return 0;
+}
