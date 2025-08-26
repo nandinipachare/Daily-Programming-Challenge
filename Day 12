@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define MAX 10000
+
+// Function to check if parentheses string is valid
+bool isValid(char *s) {
+    char stack[MAX];
+    int top = -1;
+    int len = strlen(s);
+
+    // Quick check: odd length strings can never be valid
+    if (len % 2 != 0) return false;
+
+    for (int i = 0; i < len; i++) {
+        char c = s[i];
+
+        // If opening bracket, push to stack
+        if (c == '(' || c == '{' || c == '[') {
+            stack[++top] = c;
+        } 
+        // If closing bracket, check matching pair
+        else {
+            if (top == -1) return false; // No opening bracket to match
+
+            char topChar = stack[top--]; // Pop
+            if ((c == ')' && topChar != '(') ||
+                (c == '}' && topChar != '{') ||
+                (c == ']' && topChar != '[')) {
+                return false;
+            }
+        }
+    }
+
+    // Valid only if no unmatched brackets remain
+    return (top == -1);
+}
+
+int main() {
+    // Test cases
+    char *testCases[] = {"()", "([)]", "[{()}]", "", "{[}"};
+    int n = 5;
+
+    for (int i = 0; i < n; i++) {
+        printf("Input: \"%s\"\n", testCases[i]);
+        printf("Output: %s\n\n", isValid(testCases[i]) ? "true" : "false");
+    }
+
+    return 0;
+}
