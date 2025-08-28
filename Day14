@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_CHAR 26
+
+// Function to count substrings with at most k distinct characters
+int countAtMostK(char *s, int k) {
+    int n = strlen(s);
+    int freq[MAX_CHAR] = {0};
+    int distinct = 0;
+    int left = 0;
+    int result = 0;
+
+    for (int right = 0; right < n; right++) {
+        // Include s[right]
+        if (freq[s[right] - 'a'] == 0) {
+            distinct++;
+        }
+        freq[s[right] - 'a']++;
+
+        // Shrink window if distinct > k
+        while (distinct > k) {
+            freq[s[left] - 'a']--;
+            if (freq[s[left] - 'a'] == 0) {
+                distinct--;
+            }
+            left++;
+        }
+
+        // All substrings ending at 'right' with valid window
+        result += (right - left + 1);
+    }
+
+    return result;
+}
+
+// Function to count substrings with exactly k distinct characters
+int countExactlyK(char *s, int k) {
+    if (k == 0) return 0;
+    return countAtMostK(s, k) - countAtMostK(s, k - 1);
+}
+
+int main() {
+    // Test Cases
+    char s1[] = "pqpqs";
+    int k1 = 2;
+    printf("Output: %d\n", countExactlyK(s1, k1)); // Expected 7
+
+    char s2[] = "aabacbebebe";
+    int k2 = 3;
+    printf("Output: %d\n", countExactlyK(s2, k2)); // Expected 10
+
+    char s3[] = "a";
+    int k3 = 1;
+    printf("Output: %d\n", countExactlyK(s3, k3)); // Expected 1
+
+    char s4[] = "abc";
+    int k4 = 3;
+    printf("Output: %d\n", countExactlyK(s4, k4)); // Expected 1
+
+    char s5[] = "abc";
+    int k5 = 2;
+    printf("Output: %d\n", countExactlyK(s5, k5)); // Expected 2
+
+    return 0;
+}
