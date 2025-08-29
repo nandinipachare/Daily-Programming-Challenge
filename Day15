@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <string.h>
+
+int lengthOfLongestSubstring(char *s) {
+    int n = strlen(s);
+    if (n == 0) return 0;
+
+    int lastIndex[256]; // ASCII characters
+    for (int i = 0; i < 256; i++)
+        lastIndex[i] = -1;
+
+    int maxLen = 0;
+    int start = 0; // Start index of sliding window
+
+    for (int end = 0; end < n; end++) {
+        // If character already seen, move start pointer
+        if (lastIndex[(unsigned char)s[end]] >= start) {
+            start = lastIndex[(unsigned char)s[end]] + 1;
+        }
+
+        // Update last seen index
+        lastIndex[(unsigned char)s[end]] = end;
+
+        // Update max length
+        int currentLen = end - start + 1;
+        if (currentLen > maxLen)
+            maxLen = currentLen;
+    }
+
+    return maxLen;
+}
+
+int main() {
+    char s[100005];
+
+    printf("Enter a string: ");
+    scanf("%s", s);
+
+    int result = lengthOfLongestSubstring(s);
+    printf("Length of longest substring without repeating characters: %d\n", result);
+
+    return 0;
+}
