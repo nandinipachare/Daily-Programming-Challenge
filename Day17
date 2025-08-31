@@ -1,0 +1,34 @@
+#include <stdio.h>
+#include <math.h>
+
+// Function to print prime factorization of N
+void primeFactorization(long long N) {
+    // Print the number of 2s that divide N
+    while (N % 2 == 0) {
+        printf("2 ");
+        N /= 2;
+    }
+
+    // Now N must be odd, so check only odd numbers
+    for (long long i = 3; i <= sqrt(N); i += 2) {
+        while (N % i == 0) {
+            printf("%lld ", i);
+            N /= i;
+        }
+    }
+
+    // If N is still greater than 2, then N is prime
+    if (N > 2) {
+        printf("%lld", N);
+    }
+}
+
+int main() {
+    long long N;
+    printf("Enter a number: ");
+    scanf("%lld", &N);
+
+    primeFactorization(N);
+
+    return 0;
+}
