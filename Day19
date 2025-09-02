@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX 1000   // Maximum size of stack
+
+// Stack structure
+typedef struct {
+    int data[MAX];
+    int top;
+} Stack;
+
+// Initialize stack
+void init(Stack *s) {
+    s->top = -1;
+}
+
+// Push element onto stack
+void push(Stack *s, int value) {
+    if (s->top == MAX - 1) {
+        printf("Stack overflow\n");
+        exit(1);
+    }
+    s->data[++(s->top)] = value;
+}
+
+// Pop element from stack
+int pop(Stack *s) {
+    if (s->top == -1) {
+        printf("Stack underflow\n");
+        exit(1);
+    }
+    return s->data[(s->top)--];
+}
+
+// Check if token is an operator
+int isOperator(char *token) {
+    return (strlen(token) == 1 && 
+           (*token == '+' || *token == '-' || *token == '*' || *token == '/'));
+}
+
+// Evaluate postfix expression
+int evaluatePostfix(char *expr) {
+    Stack s;
+    init(&s);
+
+    char *token = strtok(expr, " ");  // Split input by spaces
+
+    while (token != NULL) {
+        if (isOperator(token)) {
+            // Pop top 2 operands
+            int b = pop(&s);
+            int a = pop(&s);
+            int result;
+
+            switch (*token) {
+                case '+': result = a + b; break;
+                case '-': result = a - b; break;
+                case '*': result = a * b; break;
+                case '/': 
+                    if (b == 0) {
+                        printf("Division by zero error\n");
+                        exit(1);
+                    }
+                    result = a / b; // C automatically truncates toward zero
+                    break;
+            }
+            push(&s, result);
+        } else {
+            // Operand (can be negative)
+            int num = atoi(token);
+            push(&s, num);
+        }
+        token = strtok(NULL, " ");
+    }
+
+    return pop(&s);  // Final result
+}
+
+int main() {
+    char expr[MAX];
+
+    // Example: Read full line as input
+    printf("Enter postfix expression: ");
+    fgets(expr, sizeof(expr), stdin);
+
+    // Remove trailing newline
+    expr[strcspn(expr, "\n")] = '\0';
+
+    int result = evaluatePostfix(expr);
+    printf("Result: %d\n", result);
+
+    return 0;
+}
