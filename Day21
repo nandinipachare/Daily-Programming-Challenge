@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define stack structure
+#define MAX 10000  // max size as per constraint
+
+typedef struct {
+    int arr[MAX];
+    int top;
+} Stack;
+
+// Initialize stack
+void init(Stack *s) {
+    s->top = -1;
+}
+
+// Check if stack is empty
+int isEmpty(Stack *s) {
+    return s->top == -1;
+}
+
+// Check if stack is full
+int isFull(Stack *s) {
+    return s->top == MAX - 1;
+}
+
+// Push element into stack
+void push(Stack *s, int value) {
+    if (isFull(s)) {
+        printf("Stack Overflow\n");
+        return;
+    }
+    s->arr[++s->top] = value;
+}
+
+// Pop element from stack
+int pop(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack Underflow\n");
+        return -1;
+    }
+    return s->arr[s->top--];
+}
+
+// Peek top element
+int peek(Stack *s) {
+    if (isEmpty(s)) {
+        printf("Stack is Empty\n");
+        return -1;
+    }
+    return s->arr[s->top];
+}
+
+// Insert element at the bottom of stack (using recursion)
+void insertAtBottom(Stack *s, int value) {
+    if (isEmpty(s)) {
+        push(s, value);
+        return;
+    }
+
+    int temp = pop(s);
+    insertAtBottom(s, value);
+    push(s, temp);
+}
+
+// Reverse the stack using recursion
+void reverse(Stack *s) {
+    if (isEmpty(s)) {
+        return;
+    }
+
+    int temp = pop(s);
+    reverse(s);
+    insertAtBottom(s, temp);
+}
+
+// Print stack elements
+void printStack(Stack *s) {
+    for (int i = 0; i <= s->top; i++) {
+        printf("%d ", s->arr[i]);
+    }
+    printf("\n");
+}
+
+// Driver code
+int main() {
+    Stack s;
+    init(&s);
+
+    // Example input: [1, 2, 3, 4]
+    push(&s, 1);
+    push(&s, 2);
+    push(&s, 3);
+    push(&s, 4);
+
+    printf("Original Stack: ");
+    printStack(&s);
+
+    reverse(&s);
+
+    printf("Reversed Stack: ");
+    printStack(&s);
+
+    return 0;
+}
