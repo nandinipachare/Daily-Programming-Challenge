@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Node structure for adjacency list
+typedef struct Node {
+    int vertex;
+    struct Node* next;
+} Node;
+
+// Adjacency list
+typedef struct {
+    Node** list;
+    int V;
+} Graph;
+
+// Function to create a graph
+Graph* createGraph(int V) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->V = V;
+    graph->list = (Node**)malloc(V * sizeof(Node*));
+    for (int i = 0; i < V; i++) {
+        graph->list[i] = NULL;
+    }
+    return graph;
+}
+
+// Function to add edge
+void addEdge(Graph* graph, int u, int v) {
+    // Add u->v
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->vertex = v;
+    newNode->next = graph->list[u];
+    graph->list[u] = newNode;
+
+    // Add v->u (since undirected)
+    newNode = (Node*)malloc(sizeof(Node));
+    newNode->vertex = u;
+    newNode->next = graph->list[v];
+    graph->list[v] = newNode;
+}
+
+// DFS to detect cycle
+bool dfs(Graph* graph, int v, bool* visited, int parent) {
+    visited[v] = true;
+
+    Node* temp = graph->list[v];
+    while (temp != NULL) {
+        int neighbor = temp->vertex;
+
+        if (!visited[neighbor]) {
+            if (dfs(graph, neighbor, visited, v))
+                return true;
+        }
+        // If visited and not parent -> cycle
+        else if (neighbor != parent) {
+            return true;
+        }
+
+        temp = temp->next;
+    }
+    return false;
+}
+
+// Function to check if graph contains a cycle
+bool containsCycle(Graph* graph) {
+    bool* visited = (bool*)calloc(graph->V, sizeof(bool));
+
+    for (int i = 0; i < graph->V; i++) {
+        if (!visited[i]) {
+            if (dfs(graph, i, visited, -1)) {
+                free(visited);
+                return true;
+            }
+        }
+    }
+    free(visited);
+    return false;
+}
+
+// Driver code
+int main() {
+    // Example test cases
+    int V1 = 5;
+    int edges1[][2] = {{0,1},{1,2},{2,3},{3,4},{4,0}};
+    Graph* g1 = createGraph(V1);
+    for (int i = 0; i < 5; i++) {
+        addEdge(g1, edges1[i][0], edges1[i][1]);
+    }
+    printf("Output: %s\n", containsCycle(g1) ? "true" : "false");  // true
+
+    int V2 = 3;
+    int edges2[][2] = {{0,1},{1,2}};
+    Graph* g2 = createGraph(V2);
+    for (int i = 0; i < 2; i++) {
+        addEdge(g2, edges2[i][0], edges2[i][1]);
+    }
+    printf("Output: %s\n", containsCycle(g2) ? "true" : "false");  // false
+
+    int V3 = 4;
+    int edges3[][2] = {{0,1},{1,2},{2,0}};
+    Graph* g3 = createGraph(V3);
+    for (int i = 0; i < 3; i++) {
+        addEdge(g3, edges3[i][0], edges3[i][1]);
+    }
+    printf("Output: %s\n", containsCycle(g3) ? "true" : "false");  // true
+
+    return 0;
+}
