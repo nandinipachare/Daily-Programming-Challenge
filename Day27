@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Queue structure for BFS
+typedef struct {
+    int *items;
+    int front, rear;
+    int size, capacity;
+} Queue;
+
+Queue* createQueue(int capacity) {
+    Queue* q = (Queue*)malloc(sizeof(Queue));
+    q->capacity = capacity;
+    q->front = 0;
+    q->rear = -1;
+    q->size = 0;
+    q->items = (int*)malloc(capacity * sizeof(int));
+    return q;
+}
+
+bool isEmpty(Queue* q) {
+    return q->size == 0;
+}
+
+void enqueue(Queue* q, int value) {
+    if (q->size == q->capacity) return;
+    q->rear = (q->rear + 1) % q->capacity;
+    q->items[q->rear] = value;
+    q->size++;
+}
+
+int dequeue(Queue* q) {
+    if (isEmpty(q)) return -1;
+    int value = q->items[q->front];
+    q->front = (q->front + 1) % q->capacity;
+    q->size--;
+    return value;
+}
+
+// Function to find shortest path using BFS
+int shortestPath(int V, int edges[][2], int E, int start, int end) {
+    // Build adjacency list
+    int **adj = (int**)malloc(V * sizeof(int*));
+    int *adjSize = (int*)calloc(V, sizeof(int));
+
+    for (int i = 0; i < V; i++) {
+        adj[i] = (int*)malloc(V * sizeof(int));
+    }
+
+    for (int i = 0; i < E; i++) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        adj[u][adjSize[u]++] = v;
+        adj[v][adjSize[v]++] = u; // Undirected graph
+    }
+
+    // Distance array
+    int *dist = (int*)malloc(V * sizeof(int));
+    for (int i = 0; i < V; i++) dist[i] = -1;
+
+    Queue* q = createQueue(V);
+    enqueue(q, start);
+    dist[start] = 0;
+
+    while (!isEmpty(q)) {
+        int node = dequeue(q);
+
+        for (int i = 0; i < adjSize[node]; i++) {
+            int neighbor = adj[node][i];
+            if (dist[neighbor] == -1) {
+                dist[neighbor] = dist[node] + 1;
+                enqueue(q, neighbor);
+            }
+        }
+    }
+
+    int ans = dist[end];
+
+    // Free memory
+    free(dist);
+    for (int i = 0; i < V; i++) free(adj[i]);
+    free(adj);
+    free(adjSize);
+    free(q->items);
+    free(q);
+
+    return ans;
+}
+
+// Main function with test cases
+int main() {
+    // Example 1
+    int V1 = 5;
+    int edges1[][2] = {{0,1},{0,2},{1,3},{2,3},{3,4}};
+    int E1 = sizeof(edges1)/sizeof(edges1[0]);
+    printf("Output: %d\n", shortestPath(V1, edges1, E1, 0, 4)); // Expected 3
+
+    // Example 2
+    int V2 = 3;
+    int edges2[][2] = {{0,1},{1,2}};
+    int E2 = sizeof(edges2)/sizeof(edges2[0]);
+    printf("Output: %d\n", shortestPath(V2, edges2, E2, 0, 2)); // Expected 2
+
+    // Example 3
+    int V3 = 4;
+    int edges3[][2] = {{0,1},{1,2}};
+    int E3 = sizeof(edges3)/sizeof(edges3[0]);
+    printf("Output: %d\n", shortestPath(V3, edges3, E3, 2, 3)); // Expected -1
+
+    return 0;
+}
